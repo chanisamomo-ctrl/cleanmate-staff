@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Cleanmate Staff</title>
+  <style>
+    body{font-family:system-ui,Arial; margin:16px;}
+    .card{padding:14px;border:1px solid #ddd;border-radius:12px;margin:10px 0;}
+    .btn{display:block;padding:12px 14px;border-radius:10px;border:1px solid #333;text-decoration:none;color:#111;margin:8px 0;}
+    .muted{color:#666;font-size:13px;}
+  </style>
+</head>
+<body>
+  <h2>Cleanmate Staff</h2>
+  <div class="muted">เมนูพนักงาน</div>
+
+  <div class="card">
+    <a class="btn" href="./checkin.html">✅ ลงชื่อเข้างาน</a>
+    <a class="btn" href="./receive.html">🧺 รับผ้าเข้า</a>
+    <a class="btn" href="./coupon.html">🎟️ คูปอง (ทำต่อขั้นถัดไป)</a>
+    <a class="btn" href="./summary.html">📊 สรุปยอดวันนี้ (ทำต่อขั้นถัดไป)</a>
+  </div>
+
+  <div class="muted" id="status"></div>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script>
+    const LIFF_ID = "PUT_LIFF_ID_HERE"; // ใส่ทีหลังได้
+    async function init() {
+      try {
+        if (LIFF_ID !== "PUT_LIFF_ID_HERE") {
+          await liff.init({ liffId: LIFF_ID });
+        }
+        document.getElementById("status").innerText = "พร้อมใช้งาน";
+      } catch (e) {
+        document.getElementById("status").innerText = "ยังไม่ได้ใส่ LIFF ID หรือเปิดนอก LINE (ยังใช้งานหน้าเว็บได้)";
+      }
+    }
+    init();
+  </script>
+</body>
+</html>
