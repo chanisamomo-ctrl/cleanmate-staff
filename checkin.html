@@ -1,20 +1,62 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbwxRLFXKijxkzSPh2lgJtFflWPvSTIkStmNIsnsILIBAMUEkDM5MCaxzlfP4FUweystEw/exec";
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Check-in</title>
+  <style>
+    body{font-family:system-ui,Arial; margin:16px;}
+    label{display:block;margin-top:10px;}
+    input,select{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;}
+    button{width:100%;padding:12px;margin-top:14px;border-radius:10px;border:1px solid #111;}
+    .muted{color:#666;font-size:13px;}
+  </style>
+</head>
+<body>
+  <h3>✅ ลงชื่อเข้างาน</h3>
 
-async function submit() {
-  document.getElementById("msg").innerText = "กำลังบันทึก...";
+  <label>พนักงาน</label>
+  <select id="staff">
+    <option value="S001">S001</option>
+    <option value="S002">S002</option>
+    <option value="S003">S003</option>
+  </select>
 
-  const params = new URLSearchParams({
-    action: "checkin",
-    staff_id: document.getElementById("staff").value,
-    branch_id: document.getElementById("branch").value,
-    shift: document.getElementById("shift").value
-  });
+  <label>สาขา</label>
+  <select id="branch">
+    <option value="B1">B1</option>
+    <option value="B2">B2</option>
+  </select>
 
-  const res = await fetch(API_URL, {
-    method: "POST",
-    body: params
-  });
+  <label>กะ</label>
+  <select id="shift">
+    <option value="FULL">เต็มวัน</option>
+    <option value="AM">เช้า</option>
+    <option value="PM">บ่าย</option>
+  </select>
 
-  const data = await res.json();
-  document.getElementById("msg").innerText = data.ok ? ("สำเร็จ: " + data.attendance_id) : ("ไม่สำเร็จ: " + data.error);
-}
+  <button onclick="submit()">บันทึก</button>
+  <div class="muted" id="msg"></div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwxRLFXKijxkzSPh2lgJtFflWPvSTIkStmNIsnsILIBAMUEkDM5MCaxzlfP4FUweystEw/exec";
+
+    async function submit() {
+      document.getElementById("msg").innerText = "กำลังบันทึก...";
+      const body = {
+        action: "checkin",
+        staff_id: document.getElementById("staff").value,
+        branch_id: document.getElementById("branch").value,
+        shift: document.getElementById("shift").value
+      };
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      document.getElementById("msg").innerText = data.ok ? ("สำเร็จ: " + data.attendance_id) : ("ไม่สำเร็จ: " + data.error);
+    }
+  </script>
+</body>
+</html>
