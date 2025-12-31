@@ -1,20 +1,103 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbwxRLFXKijxkzSPh2lgJtFflWPvSTIkStmNIsnsILIBAMUEkDM5MCaxzlfP4FUweystEw/exec";
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Receive</title>
+  <style>
+    body{font-family:system-ui,Arial; margin:16px;}
+    label{display:block;margin-top:10px;}
+    input,select{width:100%;padding:10px;border-radius:10px;border:1px solid #ccc;}
+    button{width:100%;padding:12px;margin-top:14px;border-radius:10px;border:1px solid #111;}
+    .muted{color:#666;font-size:13px;}
+  </style>
+</head>
+<body>
+  <h3>🧺 รับผ้าเข้า</h3>
 
-async function submit() {
-  document.getElementById("msg").innerText = "กำลังบันทึก...";
+  <label>พนักงาน</label>
+  <select id="staff">
+    <option value="S001">S001</option>
+    <option value="S002">S002</option>
+    <option value="S003">S003</option>
+  </select>
 
-  const params = new URLSearchParams({
-    action: "checkin",
-    staff_id: document.getElementById("staff").value,
-    branch_id: document.getElementById("branch").value,
-    shift: document.getElementById("shift").value
-  });
+  <label>สาขา</label>
+  <select id="branch">
+    <option value="B1">B1</option>
+    <option value="B2">B2</option>
+  </select>
 
-  const res = await fetch(API_URL, {
-    method: "POST",
-    body: params
-  });
+  <label>ชื่อลูกค้า</label>
+  <input id="name" placeholder="เช่น คุณเอ"/>
 
-  const data = await res.json();
-  document.getElementById("msg").innerText = data.ok ? ("สำเร็จ: " + data.attendance_id) : ("ไม่สำเร็จ: " + data.error);
-}
+  <label>เบอร์โทร</label>
+  <input id="phone" inputmode="numeric" placeholder="089xxxxxxx"/>
+
+  <label>ประเภทบริการ</label>
+  <select id="service">
+    <option value="WASH">ซักน้ำ</option>
+    <option value="DRY">ซักแห้ง</option>
+    <option value="OTHER">อื่นๆ</option>
+  </select>
+
+  <label>ประเภทสินค้า</label>
+  <select id="item">
+    <option value="Clothes">เสื้อผ้า</option>
+    <option value="Shoes">รองเท้า</option>
+    <option value="Bag">กระเป๋า</option>
+    <option value="Doll">ตุ๊กตา</option>
+    <option value="Other">อื่นๆ</option>
+  </select>
+
+  <label>จำนวนชิ้น</label>
+  <input id="qty" type="number" min="1" value="1"/>
+
+  <label>ยอดค่าบริการ (บาท)</label>
+  <input id="amount" type="number" min="0" value="0"/>
+
+  <label>การชำระเงิน</label>
+  <select id="payMethod">
+    <option value="CASH">เงินสด</option>
+    <option value="TRANSFER">โอน</option>
+    <option value="UNPAID">ค้างชำระ</option>
+  </select>
+
+  <button onclick="submit()">บันทึก</button>
+  <div class="muted" id="msg"></div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwxRLFXKijxkzSPh2lgJtFflWPvSTIkStmNIsnsILIBAMUEkDM5MCaxzlfP4FUweystEw/exec";
+
+    async function submit() {
+      const phone = document.getElementById("phone").value.trim();
+      if (!phone) { document.getElementById("msg").innerText = "กรุณาใส่เบอร์โทร"; return; }
+
+      document.getElementById("msg").innerText = "กำลังบันทึก...";
+      const method = document.getElementById("payMethod").value;
+      const body = {
+        action: "create_transaction",
+        staff_id: document.getElementById("staff").value,
+        branch_id: document.getElementById("branch").value,
+        customer_name: document.getElementById("name").value.trim(),
+        phone,
+        service_type: document.getElementById("service").value,
+        item_category: document.getElementById("item").value,
+        item_count: Number(document.getElementById("qty").value || 1),
+        amount_thb: Number(document.getElementById("amount").value || 0),
+        payment_method: method,
+        payment_status: (method === "UNPAID" ? "UNPAID" : "PAID"),
+        remarks: ""
+      };
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      document.getElementById("msg").innerText = data.ok ? ("สำเร็จ: " + data.job_id) : ("ไม่สำเร็จ: " + data.error);
+    }
+  </script>
+</body>
+</html>
